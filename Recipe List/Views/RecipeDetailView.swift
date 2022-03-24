@@ -9,6 +9,8 @@ import SwiftUI
 
 struct RecipeDetailView: View {
     
+    @State var selectedSevingSize = 2
+    
     var recipe:Recipe
     
     var body: some View {
@@ -21,14 +23,34 @@ struct RecipeDetailView: View {
                     .frame(width: 428, height: 300, alignment: .center)
                     .clipped()
                 
+                Text(recipe.name)
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding([.leading, .top])
+                
+                // MARK: Serving Size Picker
+                VStack(alignment: .leading) {
+                    Text("Select your serving size:")
+                        .font(.headline)
+                    Picker("Serving Size: ", selection: $selectedSevingSize) {
+                        Text("2").tag(2)
+                        Text("4").tag(4)
+                        Text("6").tag(6)
+                        Text("8").tag(8)
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    .frame(width: 160)
+                }
+                .padding()
+                
                 // MARK: Ingredients
                 VStack(alignment: .leading) {
                     Text("Ingredients")
                         .font(.headline)
                         .padding(.bottom, 5.0)
                     
-                    ForEach (recipe.ingredients, id:\.self) { item in
-                        Text("• " + item)
+                    ForEach (recipe.ingredients) { item in
+                        Text("• " + RecipeModel.getPortion(ingredient: item, recipeServing: recipe.servings, targetServing: selectedSevingSize) + " " + item.name.lowercased())
                             .padding(.vertical, 1.5)
                     }
                 }
@@ -51,7 +73,7 @@ struct RecipeDetailView: View {
                 .padding(.all)
             }
         }
-        .navigationBarTitle(recipe.name)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
